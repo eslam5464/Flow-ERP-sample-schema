@@ -6,4 +6,4 @@
 - Go to this link -> [Swagger editor](https://editor-next.swagger.io)
 - Paste schema and it should be something like the image below
 
-  ![Schema sample](/images/schema-sample.png)
+  ![Schema sample](schema-sample.png)

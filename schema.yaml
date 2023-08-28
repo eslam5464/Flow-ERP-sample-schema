@@ -1,0 +1,2647 @@
+openapi: 3.0.3
+info:
+  title: Flow ERP
+  version: 0.1.0
+paths:
+  /api/v1/schema/:
+    get:
+      operationId: api_v1_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum:
+              - json
+              - yaml
+        - in: query
+          name: lang
+          schema:
+            type: string
+            enum:
+              - af
+              - ar
+              - ar-dz
+              - ast
+              - az
+              - be
+              - bg
+              - bn
+              - br
+              - bs
+              - ca
+              - ckb
+              - cs
+              - cy
+              - da
+              - de
+              - dsb
+              - el
+              - en
+              - en-au
+              - en-gb
+              - eo
+              - es
+              - es-ar
+              - es-co
+              - es-mx
+              - es-ni
+              - es-ve
+              - et
+              - eu
+              - fa
+              - fi
+              - fr
+              - fy
+              - ga
+              - gd
+              - gl
+              - he
+              - hi
+              - hr
+              - hsb
+              - hu
+              - hy
+              - ia
+              - id
+              - ig
+              - io
+              - is
+              - it
+              - ja
+              - ka
+              - kab
+              - kk
+              - km
+              - kn
+              - ko
+              - ky
+              - lb
+              - lt
+              - lv
+              - mk
+              - ml
+              - mn
+              - mr
+              - ms
+              - my
+              - nb
+              - ne
+              - nl
+              - nn
+              - os
+              - pa
+              - pl
+              - pt
+              - pt-br
+              - ro
+              - ru
+              - sk
+              - sl
+              - sq
+              - sr
+              - sr-latn
+              - sv
+              - sw
+              - ta
+              - te
+              - tg
+              - th
+              - tk
+              - tr
+              - tt
+              - udm
+              - uk
+              - ur
+              - uz
+              - vi
+              - zh-hans
+              - zh-hant
+      tags:
+        - api
+      security:
+        - basicAuth: []
+        - cookieAuth: []
+        - tokenAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ""
+  /api/v1/user/2fa:
+    put:
+      operationId: api_v1_user_2fa_update
+      description: |-
+        API view to manage two-factor authentication settings for a user.
+
+        This view allows authenticated users to enable or disable two-factor authentication
+        for their account. Users can send a PUT request with their desired two-factor
+        authentication settings to this endpoint.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - User must be authenticated.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TwoFactorAuthenticationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TwoFactorAuthenticationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TwoFactorAuthenticationRequest"
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TwoFactorAuthentication"
+          description: ""
+  /api/v1/user/all:
+    get:
+      operationId: api_v1_user_all_list
+      description: |-
+        API view to retrieve a list of user instances.
+
+        This view allows users with roles 'ADMIN' or 'MANAGER' to retrieve a list of all user instances.
+        Users with other roles can only retrieve user instances associated with their company.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users are allowed.
+        - Users with roles 'ADMIN' or 'MANAGER' are allowed to retrieve all user instances.
+        - Other users can retrieve user instances associated with their company.
+      tags:
+        - User
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGetAll"
+          description: ""
+  /api/v1/user/company:
+    get:
+      operationId: api_v1_user_company_retrieve
+      description: |-
+        This view retrieves the company object associated with the currently authenticated user
+        and returns its serialized representation using the CompanyGetSerializer.
+
+        Authentication:
+            - CustomTokenAuthentication: Users must provide a valid custom token for authentication.
+
+        Permissions:
+            - IsAuthenticated: Only authenticated users are allowed to access this view.
+
+        Response Codes:
+            - 200 OK: Successful retrieval and serialization of company details.
+            - 401 Unauthorized: If authentication credentials are missing or invalid.
+            - 403 Forbidden: If the authenticated user does not have permission to access this view.
+            - 404 Not Found: If the associated company object does not exist.
+
+        Note: Make sure to provide a valid custom token in the authentication header.
+      tags:
+        - User
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyGet"
+          description: ""
+  /api/v1/user/company-code:
+    post:
+      operationId: api_v1_user_company_code_create
+      description: |-
+        API view to create a new company creation code.
+
+        This view allows authenticated admin users to create a new company creation code.
+        Users must be authenticated using a token. The request should include the necessary
+        details for creating a company creation code.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated admin users are allowed to create company creation codes.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyCreationCodeRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CompanyCreationCodeRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CompanyCreationCodeRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyCreationCode"
+          description: ""
+  /api/v1/user/company/create:
+    post:
+      operationId: api_v1_user_company_create_create
+      description: |-
+        API view to create a new company.
+
+        This view allows admin users to create a new company by providing the
+        necessary details. Admin authentication is required to access this view.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated admin users are allowed.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CompanyCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CompanyCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyCreate"
+          description: ""
+  /api/v1/user/company/update:
+    put:
+      operationId: api_v1_user_company_update_update
+      description: |-
+        API view to update a company's details.
+
+        This view allows authenticated users with specific permissions to update
+        a company's details such as name and description. Users must be authenticated
+        using a token. The details can be updated using a PUT request with the
+        desired values.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated users with specific permissions are allowed.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CompanyUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CompanyUpdateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyUpdate"
+          description: ""
+  /api/v1/user/create:
+    post:
+      operationId: api_v1_user_create_create
+      description: |-
+        API view to create a new user.
+
+        This view allows authenticated users with the appropriate permissions
+        to create new user accounts. Users must be authenticated using a token,
+        and they must have the 'ADMIN' or 'MANAGER' role to access this endpoint.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only users with 'ADMIN' or 'MANAGER' role are allowed.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCreate"
+          description: ""
+  /api/v1/user/group:
+    post:
+      operationId: api_v1_user_group_create
+      description: |-
+        A view for creating a new user group.
+
+        This view allows authenticated users to create a new user group using the HTTP POST method.
+        Users can provide a group name for the new user group, and it will be associated with their company.
+      tags:
+        - User permission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserGroupCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserGroupCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserGroupCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserGroupCreate"
+          description: ""
+  /api/v1/user/group/{id}:
+    get:
+      operationId: api_v1_user_group_retrieve
+      description: |-
+        A view for retrieving, updating, and deleting a single user group instance.
+
+        This view allows authenticated users to perform the following operations on a user group instance:
+
+        - Retrieve details of a user group using the HTTP GET method.
+        - Update attributes of a user group using the HTTP PATCH method.
+        - Delete a user group using the HTTP DELETE method.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - User permission
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserGroupGetDelete"
+          description: ""
+    patch:
+      operationId: api_v1_user_group_partial_update
+      description: |-
+        A view for retrieving, updating, and deleting a single user group instance.
+
+        This view allows authenticated users to perform the following operations on a user group instance:
+
+        - Retrieve details of a user group using the HTTP GET method.
+        - Update attributes of a user group using the HTTP PATCH method.
+        - Delete a user group using the HTTP DELETE method.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - User permission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedUserGroupUpdateOneRequest"
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserGroupUpdateOne"
+          description: ""
+    delete:
+      operationId: api_v1_user_group_destroy
+      description: |-
+        A view for retrieving, updating, and deleting a single user group instance.
+
+        This view allows authenticated users to perform the following operations on a user group instance:
+
+        - Retrieve details of a user group using the HTTP GET method.
+        - Update attributes of a user group using the HTTP PATCH method.
+        - Delete a user group using the HTTP DELETE method.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - User permission
+      security:
+        - tokenAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/v1/user/groups:
+    get:
+      operationId: api_v1_user_groups_list
+      description: |-
+        A view for retrieving a list of user group instances.
+
+        This view allows authenticated users to retrieve a list of user groups associated with their company.
+      tags:
+        - User permission
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroupGetAll"
+          description: ""
+  /api/v1/user/me:
+    get:
+      operationId: api_v1_user_me_retrieve
+      description: |-
+        API view to retrieve details of the authenticated user.
+
+        This view allows authenticated users to retrieve their own user details.
+        Users must be authenticated using a token.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated users are allowed.
+      tags:
+        - User
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserGetCurrent"
+          description: ""
+  /api/v1/user/me/details:
+    patch:
+      operationId: api_v1_user_me_details_partial_update
+      description: |-
+        API view to update details of the authenticated user.
+
+        This view allows authenticated users to update their details such as
+        first name, last name, email, etc. Users must be authenticated using a token.
+        The details can be updated using a PATCH request with the desired values.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated users are allowed.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedUserUpdateDetailsRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedUserUpdateDetailsRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedUserUpdateDetailsRequest"
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserUpdateDetails"
+          description: ""
+  /api/v1/user/me/email:
+    put:
+      operationId: api_v1_user_me_email_update
+      description: |-
+        API view to update the email of the authenticated user.
+
+        This view allows authenticated users to update their email address.
+        Users must be authenticated using a token. The user's email can be
+        updated using a PUT request with the new email value.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated users are allowed.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateEmailRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserUpdateEmailRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserUpdateEmailRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserUpdateEmail"
+          description: ""
+  /api/v1/user/me/password:
+    put:
+      operationId: api_v1_user_me_password_update
+      description: |-
+        API view to update the password of the authenticated user.
+
+        This view allows authenticated users to update their password.
+        Users must be authenticated using a token. The new password can be
+        updated using a PUT request with the new password value.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated users are allowed.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdatePasswordRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserUpdatePasswordRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserUpdatePasswordRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserUpdatePassword"
+          description: ""
+  /api/v1/user/me/username:
+    put:
+      operationId: api_v1_user_me_username_update
+      description: |-
+        API view to update the username of the authenticated user.
+
+        This view allows authenticated users to update their username.
+        Users must be authenticated using a token. The username can be
+        updated using a PUT request with the new username value.
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - Only authenticated users are allowed.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateUsernameRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UserUpdateUsernameRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserUpdateUsernameRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserUpdateUsername"
+          description: ""
+  /api/v1/user/token:
+    post:
+      operationId: api_v1_user_token_create
+      description: |-
+        API view to create a new authentication token.
+
+        This view allows users to obtain a new authentication token by providing their
+        username and password. Users should send a POST request with their credentials
+        to this endpoint to receive an authentication token, which can be used for further
+        authenticated requests.
+
+        Authentication:
+        - No authentication required.
+
+        Permissions:
+        - No specific permissions required.
+
+        Note:
+        - The obtained token should be included in the 'Authorization' header of subsequent
+        requests as 'Token $token_value' for authentication.
+
+        Example Header:
+        Authorization: Token $token_value
+      tags:
+        - User
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AuthTokenRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AuthTokenRequest"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthTokenRequest"
+        required: true
+      security:
+        - basicAuth: []
+        - cookieAuth: []
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthToken"
+          description: ""
+  /api/v1/warehouse/categories:
+    get:
+      operationId: api_v1_warehouse_categories_list
+      description: |-
+        API view to create multiple categories and retrieve all categories.
+
+        This view allows users to create multiple category instances by providing the necessary details.
+        Users with appropriate permissions are allowed to create category instances.
+        Users are also able to retrieve a list of all categories.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to create and retrieve category instances.
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryGetDelete"
+          description: ""
+    post:
+      operationId: api_v1_warehouse_categories_create
+      description: |-
+        API view to create multiple categories and retrieve all categories.
+
+        This view allows users to create multiple category instances by providing the necessary details.
+        Users with appropriate permissions are allowed to create category instances.
+        Users are also able to retrieve a list of all categories.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to create and retrieve category instances.
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CategoryCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryCreate"
+          description: ""
+  /api/v1/warehouse/category:
+    post:
+      operationId: api_v1_warehouse_category_create
+      description: |-
+        API view to create a new category instance.
+
+        This view allows users to create a new category instance by providing the necessary details.
+        Users with appropriate permissions are allowed to create category instances.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to create category instances.
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CategoryCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CategoryCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryCreate"
+          description: ""
+  /api/v1/warehouse/category/{id}:
+    get:
+      operationId: api_v1_warehouse_category_retrieve
+      description: |-
+        API view to retrieve, update, and delete a category instance.
+
+        This view allows users to retrieve, update, and delete a specific category instance by providing the category ID.
+        Users with appropriate permissions are allowed to perform these actions.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to retrieve, update, and delete category instances.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryGetDelete"
+          description: ""
+    patch:
+      operationId: api_v1_warehouse_category_partial_update
+      description: |-
+        API view to retrieve, update, and delete a category instance.
+
+        This view allows users to retrieve, update, and delete a specific category instance by providing the category ID.
+        Users with appropriate permissions are allowed to perform these actions.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to retrieve, update, and delete category instances.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedCategoryUpdateOneRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedCategoryUpdateOneRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedCategoryUpdateOneRequest"
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryUpdateOne"
+          description: ""
+    delete:
+      operationId: api_v1_warehouse_category_destroy
+      description: |-
+        API view to retrieve, update, and delete a category instance.
+
+        This view allows users to retrieve, update, and delete a specific category instance by providing the category ID.
+        Users with appropriate permissions are allowed to perform these actions.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to retrieve, update, and delete category instances.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/v1/warehouse/product:
+    post:
+      operationId: api_v1_warehouse_product_create
+      description: |-
+        API view for creating a single product instance.
+
+        This view allows users to create a new product instance by providing the necessary details. Users with appropriate
+        permissions are allowed to create product instances.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to create product instances.
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ProductCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProductCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductCreate"
+          description: ""
+  /api/v1/warehouse/product/{id}:
+    get:
+      operationId: api_v1_warehouse_product_retrieve
+      description: |-
+        API view for retrieving, updating, and deleting a single product instance.
+
+        This view allows users to retrieve, update, or delete an existing product instance by providing the product's ID.
+        Users with appropriate permissions are allowed to perform these actions.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to retrieve, update, or delete product instances.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductGetDelete"
+          description: ""
+    patch:
+      operationId: api_v1_warehouse_product_partial_update
+      description: |-
+        API view for retrieving, updating, and deleting a single product instance.
+
+        This view allows users to retrieve, update, or delete an existing product instance by providing the product's ID.
+        Users with appropriate permissions are allowed to perform these actions.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to retrieve, update, or delete product instances.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedProductUpdateOneRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedProductUpdateOneRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedProductUpdateOneRequest"
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductUpdateOne"
+          description: ""
+    delete:
+      operationId: api_v1_warehouse_product_destroy
+      description: |-
+        API view for retrieving, updating, and deleting a single product instance.
+
+        This view allows users to retrieve, update, or delete an existing product instance by providing the product's ID.
+        Users with appropriate permissions are allowed to perform these actions.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to retrieve, update, or delete product instances.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/v1/warehouse/products:
+    get:
+      operationId: api_v1_warehouse_products_list
+      description: |-
+        API view for creating and retrieving multiple product instances.
+
+        This view allows users to create multiple product instances in a batch or retrieve a list of existing product
+        instances. Users with appropriate permissions are allowed to create and retrieve product instances.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to create and retrieve product instances.
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductGetDelete"
+          description: ""
+    post:
+      operationId: api_v1_warehouse_products_create
+      description: |-
+        API view for creating and retrieving multiple product instances.
+
+        This view allows users to create multiple product instances in a batch or retrieve a list of existing product
+        instances. Users with appropriate permissions are allowed to create and retrieve product instances.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to create and retrieve product instances.
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProductCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductCreate"
+          description: ""
+  /api/v1/warehouse/storage:
+    post:
+      operationId: api_v1_warehouse_storage_create
+      description: |-
+        API view to create a new storage instance.
+
+        This view allows users to create a new storage instance by providing the necessary details.
+        Users with appropriate permissions are allowed to create storage instances.
+
+        Authentication:
+
+        - Token-based authentication required.
+
+        Permissions:
+
+        - Only authenticated users with appropriate permissions are allowed to create storage instances.
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageCreateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/StorageCreateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/StorageCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageCreate"
+          description: ""
+  /api/v1/warehouse/storage/{id}:
+    get:
+      operationId: api_v1_warehouse_storage_retrieve
+      description: |-
+        A view for retrieving, updating with patch, and deleting a specific storage instance.
+
+        This view allows authenticated users to perform the following operations on a storage instance:
+
+        - Retrieve details of the storage.
+        - Update the storage using partial update (PATCH) method.
+        - Delete the storage.
+
+        Authentication:
+
+        - Requires token authentication.
+
+        Permissions:
+
+        - Users must be authenticated.
+        - Users must have appropriate permissions to perform the operations.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageGetDelete"
+          description: ""
+    patch:
+      operationId: api_v1_warehouse_storage_partial_update
+      description: |-
+        A view for retrieving, updating with patch, and deleting a specific storage instance.
+
+        This view allows authenticated users to perform the following operations on a storage instance:
+
+        - Retrieve details of the storage.
+        - Update the storage using partial update (PATCH) method.
+        - Delete the storage.
+
+        Authentication:
+
+        - Requires token authentication.
+
+        Permissions:
+
+        - Users must be authenticated.
+        - Users must have appropriate permissions to perform the operations.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedStorageUpdateOneRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedStorageUpdateOneRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedStorageUpdateOneRequest"
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageUpdateOne"
+          description: ""
+    delete:
+      operationId: api_v1_warehouse_storage_destroy
+      description: |-
+        A view for retrieving, updating with patch, and deleting a specific storage instance.
+
+        This view allows authenticated users to perform the following operations on a storage instance:
+
+        - Retrieve details of the storage.
+        - Update the storage using partial update (PATCH) method.
+        - Delete the storage.
+
+        Authentication:
+
+        - Requires token authentication.
+
+        Permissions:
+
+        - Users must be authenticated.
+        - Users must have appropriate permissions to perform the operations.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/v1/warehouse/storages:
+    get:
+      operationId: api_v1_warehouse_storages_list
+      description: |-
+        A view for creating multiple storage instances and retrieving all storage instances.
+
+        This view allows authenticated users to perform the following operations on storage instances:
+
+        - Create multiple storage instances using a list of data in the request body.
+        - Retrieve a list of all storage instances associated with the user's company.
+
+        Authentication:
+
+        - Requires token authentication.
+
+        Permissions:
+
+        - Users must be authenticated.
+        - Users must have appropriate permissions to create and retrieve storage instances.
+
+        Example Usage:
+
+        - GET: /api/storages/ - Retrieve a list of all storage instances.
+        - POST: /api/storages/ - Create multiple storage instances in one request.
+        POST Request Body: [{"name": "Storage A", "description": "Description A"},
+            {"name": "Storage B", "description": "Description B"}]
+      tags:
+        - Warehouse
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StorageGetDelete"
+          description: ""
+    post:
+      operationId: api_v1_warehouse_storages_create
+      description: |-
+        A view for creating multiple storage instances and retrieving all storage instances.
+
+        This view allows authenticated users to perform the following operations on storage instances:
+
+        - Create multiple storage instances using a list of data in the request body.
+        - Retrieve a list of all storage instances associated with the user's company.
+
+        Authentication:
+
+        - Requires token authentication.
+
+        Permissions:
+
+        - Users must be authenticated.
+        - Users must have appropriate permissions to create and retrieve storage instances.
+
+        Example Usage:
+
+        - GET: /api/storages/ - Retrieve a list of all storage instances.
+        - POST: /api/storages/ - Create multiple storage instances in one request.
+        POST Request Body: [{"name": "Storage A", "description": "Description A"},
+            {"name": "Storage B", "description": "Description B"}]
+      tags:
+        - Warehouse
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/StorageCreateRequest"
+        required: true
+      security:
+        - tokenAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StorageCreate"
+          description: ""
+components:
+  schemas:
+    AuthToken:
+      type: object
+      description: |-
+        This serializer is used to obtain an authentication token by providing
+        valid user credentials.
+
+        Attributes:
+        - username (str): The username of the user.
+        - password (str): The password of the user.
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - password
+        - username
+    AuthTokenRequest:
+      type: object
+      description: |-
+        This serializer is used to obtain an authentication token by providing
+        valid user credentials.
+
+        Attributes:
+        - username (str): The username of the user.
+        - password (str): The password of the user.
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+        - password
+        - username
+    CategoryCreate:
+      type: object
+      description: |-
+        Serializer for creating a new category instance.
+
+        This serializer allows creating a new category instance by providing the necessary details.
+        Users can provide the category name, description, and associated storage ID for the creation.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the category instance (read-only).
+        - name (CharField): The name of the category (required).
+        - description (CharField): The description of the category (optional).
+        - storage (UUIDField): The ID of the associated storage instance (required).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    CategoryCreateRequest:
+      type: object
+      description: |-
+        Serializer for creating a new category instance.
+
+        This serializer allows creating a new category instance by providing the necessary details.
+        Users can provide the category name, description, and associated storage ID for the creation.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the category instance (read-only).
+        - name (CharField): The name of the category (required).
+        - description (CharField): The description of the category (optional).
+        - storage (UUIDField): The ID of the associated storage instance (required).
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+        description:
+          type: string
+          writeOnly: true
+          minLength: 1
+        storage:
+          type: string
+          format: uuid
+          writeOnly: true
+      required:
+        - name
+        - storage
+    CategoryGetDelete:
+      type: object
+      description: |-
+        Serializer for retrieving and deleting category instances.
+
+        This serializer is used to retrieve and delete category instances in views where category details need to be
+        retrieved or deleted. It includes fields for the category's ID, name, description, storage ID, creation date, and
+        company.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the category instance (read-only).
+        - name (CharField): The name of the category (read-only).
+        - description (CharField): The description of the category (read-only).
+        - storage (UUIDField): The ID of the associated storage instance (write-only).
+        - creation_date (DateTimeField): The creation date of the category (read-only).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        storage:
+          type: string
+          format: uuid
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - creation_date
+        - description
+        - id
+        - name
+        - storage
+    CategoryUpdateOne:
+      type: object
+      description: |-
+        Serializer for updating a category instance.
+
+        This serializer allows updating an existing category instance by providing the necessary details.
+        Users can provide the category ID, name, description, and associated storage ID for the update.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the category instance (read-only).
+        - name (CharField): The name of the category (optional).
+        - description (CharField): The description of the category (optional).
+        - storage (UUIDField): The ID of the associated storage instance (optional).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    CompanyCreate:
+      type: object
+      description: |-
+        This serializer allows creating a new company using a valid creation code.
+        Users can provide a name for the company and a creation code to associate it.
+
+        Attributes:
+        - creation_code (str): The creation code for the company.
+
+        Note:
+
+        - The creation code should be a valid code that matches an existing creation code in the system.
+        - The creation code is validated against existing creation codes in the system.
+        - The creation code must be unique and should not have been used before.
+        - The creation code is marked as used after successfully creating the company.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    CompanyCreateRequest:
+      type: object
+      description: |-
+        This serializer allows creating a new company using a valid creation code.
+        Users can provide a name for the company and a creation code to associate it.
+
+        Attributes:
+        - creation_code (str): The creation code for the company.
+
+        Note:
+
+        - The creation code should be a valid code that matches an existing creation code in the system.
+        - The creation code is validated against existing creation codes in the system.
+        - The creation code must be unique and should not have been used before.
+        - The creation code is marked as used after successfully creating the company.
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 50
+        creation_code:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - creation_code
+        - name
+    CompanyCreationCode:
+      type: object
+      description: |-
+        Serializer for managing company creation codes.
+
+        This serializer is used to manage the creation codes associated with companies.
+
+        Attributes:
+        - name (str): The name of the creation code.
+        - description (str): The description of the creation code.
+        - creation_code (str): The generated creation code.
+      properties:
+        creation_code:
+          type: string
+          readOnly: true
+      required:
+        - creation_code
+    CompanyCreationCodeRequest:
+      type: object
+      description: |-
+        Serializer for managing company creation codes.
+
+        This serializer is used to manage the creation codes associated with companies.
+
+        Attributes:
+        - name (str): The name of the creation code.
+        - description (str): The description of the creation code.
+        - creation_code (str): The generated creation code.
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 30
+        description:
+          type: string
+          writeOnly: true
+          nullable: true
+          minLength: 1
+          maxLength: 300
+      required:
+        - name
+    CompanyGet:
+      type: object
+      description: |-
+        Serializer for retrieving company details.
+
+        This serializer is used to retrieve details for a company instance.
+        It includes the company's ID and name in the serialized output.
+
+        Attributes:
+        - id (UUIDField): The unique identifier of the company.
+        - name (CharField): The name of the company.
+
+        Note:
+        - The 'id' and 'name' fields are read-only and will not accept input during serialization.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+      required:
+        - id
+        - name
+    CompanyUpdate:
+      type: object
+      description: |-
+        This serializer allows authenticated users to update the name of their company.
+        Users can send a PUT request with the desired company name to update it.
+
+        Attributes:
+        - id (UUIDField): The unique identifier of the company (read-only).
+        - name (str): The new name for the company (required, write-only).
+
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - User must be authenticated.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    CompanyUpdateRequest:
+      type: object
+      description: |-
+        This serializer allows authenticated users to update the name of their company.
+        Users can send a PUT request with the desired company name to update it.
+
+        Attributes:
+        - id (UUIDField): The unique identifier of the company (read-only).
+        - name (str): The new name for the company (required, write-only).
+
+
+        Authentication:
+        - Token-based authentication required.
+
+        Permissions:
+        - User must be authenticated.
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - name
+    PatchedCategoryUpdateOneRequest:
+      type: object
+      description: |-
+        Serializer for updating a category instance.
+
+        This serializer allows updating an existing category instance by providing the necessary details.
+        Users can provide the category ID, name, description, and associated storage ID for the update.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the category instance (read-only).
+        - name (CharField): The name of the category (optional).
+        - description (CharField): The description of the category (optional).
+        - storage (UUIDField): The ID of the associated storage instance (optional).
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+        description:
+          type: string
+          writeOnly: true
+          minLength: 1
+        storage:
+          type: string
+          format: uuid
+          writeOnly: true
+    PatchedProductUpdateOneRequest:
+      type: object
+      description: |-
+        Serializer for updating a product instance.
+
+        This serializer allows updating an existing product by providing the necessary details. Users can provide the
+        product name, description, barcode, category ID, quantity type, quantity, and minimum quantity for the update.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the product instance (read-only).
+        - name (CharField): The name of the product (write-only).
+        - description (CharField): The description of the product (write-only).
+        - barcode (CharField): The barcode of the product (write-only).
+        - category (UUIDField): The ID of the associated category instance (write-only).
+        - quantity_type (CharField): The type of quantity (write-only).
+        - quantity (DecimalField): The quantity of the product (write-only).
+        - quantity_minimum (DecimalField): The minimum quantity of the product (write-only).
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 50
+        description:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 200
+        barcode:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 100
+        category:
+          type: string
+          format: uuid
+          writeOnly: true
+        quantity_type:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 30
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,8})?$
+          writeOnly: true
+        quantity_minimum:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,8})?$
+          writeOnly: true
+    PatchedStorageUpdateOneRequest:
+      type: object
+      description: |-
+        Serializer for updating a storage.
+
+        This serializer allows updating an existing storage by providing the necessary details.
+        Users can provide the storage ID, name, and an optional description for the update.
+
+        Attributes:
+
+        - id (UUIDField): The unique identifier of the storage (required).
+        - name (CharField): The name of the storage (required).
+        - description (CharField): The description of the storage.
+
+        Note:
+
+        - The 'id' field is required for updating the storage.
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+        description:
+          type: string
+          writeOnly: true
+          minLength: 1
+    PatchedUserGroupUpdateOneRequest:
+      type: object
+      description: |-
+        Serializer for updating a user group.
+
+        This serializer allows updating an existing user group by providing the necessary details.
+        Users can update the group name and the associated permissions for the user group.
+
+        Attributes:
+
+        - group_name (CharField): The updated name of the user group.
+        - permissions (ManyRelatedField): The associated permissions for the user group.
+
+        Note:
+        - This serializer is designed for updating user group instances.
+      properties:
+        group_name:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 300
+        permissions:
+          type: array
+          items:
+            type: integer
+    PatchedUserUpdateDetailsRequest:
+      type: object
+      description: |-
+        Serializer for updating the details of a user.
+
+        This serializer allows updating the first name and last name of a user.
+
+        Attributes:
+
+        - first_name (str): The new first name for the user.
+        - last_name (str): The new last name for the user.
+      properties:
+        first_name:
+          type: string
+          writeOnly: true
+          minLength: 1
+        last_name:
+          type: string
+          writeOnly: true
+          minLength: 1
+    ProductCreate:
+      type: object
+      description: |-
+        Serializer for creating product instances.
+
+        This serializer allows creating a new product instance by providing the necessary details. Users can provide
+        the product name, description, barcode, category ID, quantity type, quantity, and minimum quantity for the creation.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the product instance (read-only).
+        - name (CharField): The name of the product (required).
+        - description (CharField): The description of the product.
+        - barcode (CharField): The barcode of the product.
+        - category (UUIDField): The ID of the associated category instance (required).
+        - quantity_type (CharField): The type of quantity.
+        - quantity (DecimalField): The quantity of the product.
+        - quantity_minimum (DecimalField): The minimum quantity of the product.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    ProductCreateRequest:
+      type: object
+      description: |-
+        Serializer for creating product instances.
+
+        This serializer allows creating a new product instance by providing the necessary details. Users can provide
+        the product name, description, barcode, category ID, quantity type, quantity, and minimum quantity for the creation.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the product instance (read-only).
+        - name (CharField): The name of the product (required).
+        - description (CharField): The description of the product.
+        - barcode (CharField): The barcode of the product.
+        - category (UUIDField): The ID of the associated category instance (required).
+        - quantity_type (CharField): The type of quantity.
+        - quantity (DecimalField): The quantity of the product.
+        - quantity_minimum (DecimalField): The minimum quantity of the product.
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 50
+        description:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 200
+        barcode:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 100
+        category:
+          type: string
+          format: uuid
+          writeOnly: true
+        quantity_type:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 30
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,8})?$
+          writeOnly: true
+        quantity_minimum:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,8})?$
+          writeOnly: true
+      required:
+        - barcode
+        - category
+        - name
+        - quantity
+        - quantity_minimum
+        - quantity_type
+    ProductGetDelete:
+      type: object
+      description: |-
+        Serializer for retrieving and deleting product instances.
+
+        This serializer is used to retrieve and delete product instances in views where product details need to be
+        retrieved or deleted. It includes fields for the product's ID, name, description, barcode, category ID,
+        quantity type, quantity, minimum quantity, creation date, and company.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the product instance (read-only).
+        - name (CharField): The name of the product (read-only).
+        - description (CharField): The description of the product (read-only).
+        - barcode (CharField): The barcode of the product (read-only).
+        - category (UUIDField): The ID of the associated category instance (read-only).
+        - quantity_type (CharField): The type of quantity (read-only).
+        - quantity (DecimalField): The quantity of the product (read-only).
+        - quantity_minimum (DecimalField): The minimum quantity of the product (read-only).
+        - creation_date (DateTimeField): The creation date of the product (read-only).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        barcode:
+          type: string
+          readOnly: true
+        category:
+          type: string
+          format: uuid
+          readOnly: true
+        quantity_type:
+          type: string
+          readOnly: true
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,8})?$
+          readOnly: true
+        quantity_minimum:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,8})?$
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - barcode
+        - category
+        - creation_date
+        - description
+        - id
+        - name
+        - quantity
+        - quantity_minimum
+        - quantity_type
+    ProductUpdateOne:
+      type: object
+      description: |-
+        Serializer for updating a product instance.
+
+        This serializer allows updating an existing product by providing the necessary details. Users can provide the
+        product name, description, barcode, category ID, quantity type, quantity, and minimum quantity for the update.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the product instance (read-only).
+        - name (CharField): The name of the product (write-only).
+        - description (CharField): The description of the product (write-only).
+        - barcode (CharField): The barcode of the product (write-only).
+        - category (UUIDField): The ID of the associated category instance (write-only).
+        - quantity_type (CharField): The type of quantity (write-only).
+        - quantity (DecimalField): The quantity of the product (write-only).
+        - quantity_minimum (DecimalField): The minimum quantity of the product (write-only).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    StorageCreate:
+      type: object
+      description: |-
+        Serializer for creating a new storage.
+
+        This serializer allows creating a new storage by providing the necessary details.
+        Users can provide a name and an optional description for the storage.
+
+        Attributes:
+
+        - id (UUIDField): The unique identifier of the storage (read-only field).
+        - name (CharField): The name of the storage.
+        - description (CharField): The description of the storage.
+
+        Note:
+
+        - The 'id' field is read-only and will not accept input during serialization.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    StorageCreateRequest:
+      type: object
+      description: |-
+        Serializer for creating a new storage.
+
+        This serializer allows creating a new storage by providing the necessary details.
+        Users can provide a name and an optional description for the storage.
+
+        Attributes:
+
+        - id (UUIDField): The unique identifier of the storage (read-only field).
+        - name (CharField): The name of the storage.
+        - description (CharField): The description of the storage.
+
+        Note:
+
+        - The 'id' field is read-only and will not accept input during serialization.
+      properties:
+        name:
+          type: string
+          writeOnly: true
+          minLength: 1
+        description:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+        - name
+    StorageGetDelete:
+      type: object
+      description: |-
+        Serializer for retrieving and deleting storage instances.
+
+        This serializer is used in views where storage details need to be retrieved
+        and deleted. It includes fields for the storage's ID, name, description.
+        The ID field is marked as write-only.
+
+        Attributes:
+        - id (UUIDField): The ID of the storage instance (write-only).
+        - name (CharField): The name of the storage (read-only).
+        - description (CharField): The description of the storage (read-only).
+
+        Note:
+
+        - This serializer is designed for read-only purposes in retrieve and delete views.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - creation_date
+        - description
+        - id
+        - name
+    StorageUpdateOne:
+      type: object
+      description: |-
+        Serializer for updating a storage.
+
+        This serializer allows updating an existing storage by providing the necessary details.
+        Users can provide the storage ID, name, and an optional description for the update.
+
+        Attributes:
+
+        - id (UUIDField): The unique identifier of the storage (required).
+        - name (CharField): The name of the storage (required).
+        - description (CharField): The description of the storage.
+
+        Note:
+
+        - The 'id' field is required for updating the storage.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    TwoFactorAuthentication:
+      type: object
+      description: |-
+        Serializer for managing two-factor authentication.
+
+        This serializer is used to manage the two-factor authentication settings
+        for a user.
+
+        Attributes:
+        - tfa_secret (str): The secret key used for two-factor authentication.
+      properties:
+        tfa_secret:
+          type: string
+          nullable: true
+          maxLength: 60
+    TwoFactorAuthenticationRequest:
+      type: object
+      description: |-
+        Serializer for managing two-factor authentication.
+
+        This serializer is used to manage the two-factor authentication settings
+        for a user.
+
+        Attributes:
+        - tfa_secret (str): The secret key used for two-factor authentication.
+      properties:
+        tfa_secret:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 60
+    UserCreate:
+      type: object
+      description: |-
+        Serializer for creating a new user.
+
+        This serializer is used to create a new user with the specified attributes.
+
+        Attributes:
+
+        - id (UUIDField): The unique identifier for the user.
+        - username (str): The username of the user.
+        - email (str): The email address of the user.
+        - password (str): The password for the user.
+        - first_name (str): The first name of the user.
+        - last_name (str): The last name of the user.
+        - user_role (ChoiceField): The role of the user.
+
+        Raises:
+            PermissionDenied: Raised if the username or email already exists.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    UserCreateRequest:
+      type: object
+      description: |-
+        Serializer for creating a new user.
+
+        This serializer is used to create a new user with the specified attributes.
+
+        Attributes:
+
+        - id (UUIDField): The unique identifier for the user.
+        - username (str): The username of the user.
+        - email (str): The email address of the user.
+        - password (str): The password for the user.
+        - first_name (str): The first name of the user.
+        - last_name (str): The last name of the user.
+        - user_role (ChoiceField): The role of the user.
+
+        Raises:
+            PermissionDenied: Raised if the username or email already exists.
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        email:
+          type: string
+          format: email
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        first_name:
+          type: string
+          writeOnly: true
+          minLength: 1
+        last_name:
+          type: string
+          writeOnly: true
+          minLength: 1
+        user_role:
+          allOf:
+            - $ref: "#/components/schemas/UserRoleEnum"
+          writeOnly: true
+          default: E
+    UserGetAll:
+      type: object
+      description: |-
+        Serializer for retrieving a list of user instances.
+
+        This serializer is used to retrieve a list of user instances in views where users need to be listed.
+        It includes fields for the user's ID, username, email, first name, last name, user role, and whether
+        the user is active. All fields are marked as read-only.
+
+        Attributes:
+
+        - id (UUIDField): The ID of the user instance (read-only).
+        - username (CharField): The username of the user (read-only).
+        - email (EmailField): The email address of the user (read-only).
+        - first_name (CharField): The first name of the user (read-only).
+        - last_name (CharField): The last name of the user (read-only).
+        - user_role (CharField): The text representation of the user's role (read-only).
+        - is_active (BooleanField): Indicates whether the user is active (read-only).
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+          nullable: true
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        user_role:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+        - email
+        - first_name
+        - id
+        - is_active
+        - last_name
+        - user_role
+        - username
+    UserGetCurrent:
+      type: object
+      description: |-
+        Serializer for retrieving user details.
+
+        This serializer is used to retrieve and serialize the details of a user.
+
+        Attributes:
+
+        - id (UUIDField): The unique identifier for the user.
+        - username (str): The username of the user.
+        - email (str): The email address of the user.
+        - first_name (str): The first name of the user.
+        - last_name (str): The last name of the user.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+          nullable: true
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+      required:
+        - email
+        - first_name
+        - id
+        - last_name
+        - username
+    UserGroupCreate:
+      type: object
+      description: |-
+        Serializer for creating a new user group.
+
+        This serializer allows creating a new user group by providing the necessary details.
+        Users can provide a group name, and a new user group will be created under the user's company.
+        The group name will be combined with the company name to form a unique name for the group.
+
+        Attributes:
+
+        - id (IntegerField): The unique identifier of the group (read-only field).
+        - group_name (CharField): The name of the user group (write-only field).
+
+        Note:
+        - The 'id' field is read-only and will not accept input during serialization.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+      required:
+        - id
+    UserGroupCreateRequest:
+      type: object
+      description: |-
+        Serializer for creating a new user group.
+
+        This serializer allows creating a new user group by providing the necessary details.
+        Users can provide a group name, and a new user group will be created under the user's company.
+        The group name will be combined with the company name to form a unique name for the group.
+
+        Attributes:
+
+        - id (IntegerField): The unique identifier of the group (read-only field).
+        - group_name (CharField): The name of the user group (write-only field).
+
+        Note:
+        - The 'id' field is read-only and will not accept input during serialization.
+      properties:
+        group_name:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 300
+      required:
+        - group_name
+    UserGroupGetAll:
+      type: object
+      description: |-
+        Serializer for retrieving all user groups.
+
+        This serializer is used to retrieve all user groups associated with current user company.
+        It includes fields for the group's company, name, and other attributes.
+
+        Attributes:
+
+        - id (IntegerField): The unique identifier of the group (read-only).
+        - group_name (CharField): The name of the user group (read-only).
+        - permissions (ManyRelatedField): The associated permissions for the user group (read-only).
+
+        Note:
+        - This serializer is designed for read-only purposes in retrieving all user group instances.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        group_name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: integer
+      required:
+        - group_name
+        - id
+    UserGroupGetDelete:
+      type: object
+      description: |-
+        Serializer for retrieving and deleting user groups.
+
+        This serializer is used in views where user group details need to be retrieved and deleted.
+        It includes fields for the group's ID, group name, and other attributes.
+
+        Attributes:
+
+        - group_name (CharField): The name of the user group (read-only).
+
+        Note:
+        - This serializer is designed for read-only purposes in retrieve and delete views.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        group_name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: integer
+      required:
+        - group_name
+        - id
+    UserGroupUpdateOne:
+      type: object
+      description: |-
+        Serializer for updating a user group.
+
+        This serializer allows updating an existing user group by providing the necessary details.
+        Users can update the group name and the associated permissions for the user group.
+
+        Attributes:
+
+        - group_name (CharField): The updated name of the user group.
+        - permissions (ManyRelatedField): The associated permissions for the user group.
+
+        Note:
+        - This serializer is designed for updating user group instances.
+      properties:
+        group_name:
+          type: string
+          nullable: true
+          maxLength: 300
+        permissions:
+          type: array
+          items:
+            type: integer
+    UserRoleEnum:
+      enum:
+        - M
+        - S
+        - E
+      type: string
+      description: |-
+        * `M` - Manager
+        * `S` - Supervisor
+        * `E` - Employee
+    UserUpdateDetails:
+      type: object
+      description: |-
+        Serializer for updating the details of a user.
+
+        This serializer allows updating the first name and last name of a user.
+
+        Attributes:
+
+        - first_name (str): The new first name for the user.
+        - last_name (str): The new last name for the user.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    UserUpdateEmail:
+      type: object
+      description: |-
+        Serializer for updating the email of a user.
+
+        This serializer allows updating the email address of a user.
+
+        Attributes:
+
+        - email (str): The new email address for the user.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    UserUpdateEmailRequest:
+      type: object
+      description: |-
+        Serializer for updating the email of a user.
+
+        This serializer allows updating the email address of a user.
+
+        Attributes:
+
+        - email (str): The new email address for the user.
+      properties:
+        email:
+          type: string
+          format: email
+          writeOnly: true
+          minLength: 1
+      required:
+        - email
+    UserUpdatePassword:
+      type: object
+      description: |-
+        Serializer for updating the password of a user.
+
+        This serializer allows updating the password of a user. The new password
+        must adhere to the specified validation rules and length constraints.
+
+        Attributes:
+
+        - password (str): The new password for the user.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    UserUpdatePasswordRequest:
+      type: object
+      description: |-
+        Serializer for updating the password of a user.
+
+        This serializer allows updating the password of a user. The new password
+        must adhere to the specified validation rules and length constraints.
+
+        Attributes:
+
+        - password (str): The new password for the user.
+      properties:
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+          maxLength: 50
+      required:
+        - password
+    UserUpdateUsername:
+      type: object
+      description: |-
+        Serializer for updating the username of a user.
+
+        This serializer allows updating the username of a user. The new username
+        must adhere to the specified validation rules and length constraints.
+
+        Attributes:
+
+        - username (str): The new username for the user.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - id
+    UserUpdateUsernameRequest:
+      type: object
+      description: |-
+        Serializer for updating the username of a user.
+
+        This serializer allows updating the username of a user. The new username
+        must adhere to the specified validation rules and length constraints.
+
+        Attributes:
+
+        - username (str): The new username for the user.
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 5
+          maxLength: 30
+      required:
+        - username
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
